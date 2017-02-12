@@ -36,9 +36,4 @@ data.molarWeight.nitrogenOxide = 30;
 data.molarWeight.nitrogenDioxide = 46;
 
 data.molarWeight.average = sum(cell2mat(struct2cell(data.molarWeight)).*cell2mat(struct2cell(data.moleFraction)));
-
-
-% Temperature and Pressure
-data.temperature = 600; %K
-data.pressure = 1; %bar
 end

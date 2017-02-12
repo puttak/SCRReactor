@@ -1,4 +1,4 @@
-function [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPBR(vol, T, NOxToAmmoniaRatio)
+function [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, vol, T, NOxToAmmoniaRatio)
 % This Script models a NOx removal by SCR unit. The reactor is modelled as
 % a plug flow reactor, where the volume corresponds to the volume of the
 % wall of the monolith honeycomb
@@ -9,8 +9,7 @@ function [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPBR(vol
 
 
 %% Reactant Inital data:
-% Load the data from the function
-flueGasData = initialFlueGasFlow();
+
 NOXpercent = 1.15;
 % NOxToAmmoniaRatio = 1.15;
 NOxToOxygenRatio = NOxToAmmoniaRatio*20*0.21;
@@ -38,7 +37,7 @@ cat_SpecSurAre =  146; %m
 
 
 %r1 = @(c_NO,c_NH3) (kNO*KNH3*c_NO*c_NH3)/(1+KNH3*c_NH3);
-[shomateVars, Hf298, ~] = shomateLoader([{'NO'},{'N2'},{'NH3'},{'H2O'},{'O2'},{'CO2'}]);
+[shomateVars, Hf298] = shomateLoader([{'NO'},{'N2'},{'NH3'},{'H2O'},{'O2'},{'CO2'}]);
 
 cp = @(x,T) x(1)+x(2)*(T/1000)+x(3)*(T/1000)^2+x(4)*(T/1000)^3+x(5)/((T/1000)^2);
 Hf = @(x,T,H298) H298+x(1)*(T/1000)+x(2)*((T/1000)^2)/2+x(3)*((T/1000)^3)/3+x(4)*((T/1000)^4)/4-x(5)/(T/1000)+x(6)-x(8);

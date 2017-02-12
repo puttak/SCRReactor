@@ -1,4 +1,4 @@
-function [WB, Hf298, atomBalance] = shomateLoader(desiredComponents)
+function [WB, Hf298] = shomateLoader(desiredComponents)
 gibbsData = loadjson('shomate.json');
 for i=1:length(desiredComponents)
     j = 1;
@@ -17,7 +17,6 @@ for i=1:length(desiredComponents)
         % We found the record
         WB(i,:) = gibbsData{j}.shomate;
         Hf298(i,:) = gibbsData{j}.H_f298;
-        atomBalance(:,i) = gibbsData{j}.balance;
     end
 end
 end

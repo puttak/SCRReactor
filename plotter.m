@@ -3,7 +3,7 @@ desiredVolume = 21;
 
 vols = [10:0.5:desiredVolume];
 parfor i=1:length(vols)
-    [nox(i),~,~]=reactorAsPBR(vols(i),620,1);
+    [nox(i),~,~]=reactorAsPBR(vols(i),620,0.85);
 end
 
 figure(1);
@@ -12,7 +12,7 @@ plot(vols,nox,[vols(1) vols(end)],[200 200]);
 %% Temp Conversion
 temps = [550:5:800];
 parfor i=1:length(temps)
-    [~,xno(i),xnh3(i), kno(i),knh3(i)]=reactorAsPBR(desiredVolume,temps(i),1);
+    [~,xno(i),xnh3(i), kno(i),knh3(i)]=reactorAsPBR(desiredVolume,temps(i),0.85);
 end
 
 figure(2);
@@ -25,7 +25,7 @@ legend('k_N_O','k_N_H_3');
 %% Ammonia Conversion
 ammoniaRatio = [0:0.01:2];
 parfor i=1:length(ammoniaRatio)
-    [~,xnon(i),xnh3n(i)]=reactorAsPBR(desiredVolume,600,ammoniaRatio(i));
+    [~,xnon(i),xnh3n(i)]=reactorAsPBR(desiredVolume,620,ammoniaRatio(i));
 end
 
 figure(3);
