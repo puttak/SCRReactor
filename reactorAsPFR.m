@@ -37,7 +37,7 @@ cat_SpecSurAre =  146; %m
 
 
 %r1 = @(c_NO,c_NH3) (kNO*KNH3*c_NO*c_NH3)/(1+KNH3*c_NH3);
-[shomateVars, Hf298] = shomateLoader([{'NO'},{'N2'},{'NH3'},{'H2O'},{'O2'},{'CO2'}]);
+% [shomateVars, Hf298] = shomateLoader([{'NO'},{'N2'},{'NH3'},{'H2O'},{'O2'},{'CO2'}]);
 
 cp = @(x,T) x(1)+x(2)*(T/1000)+x(3)*(T/1000)^2+x(4)*(T/1000)^3+x(5)/((T/1000)^2);
 Hf = @(x,T,H298) H298+x(1)*(T/1000)+x(2)*((T/1000)^2)/2+x(3)*((T/1000)^3)/3+x(4)*((T/1000)^4)/4-x(5)/(T/1000)+x(6)-x(8);
