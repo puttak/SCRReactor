@@ -1,6 +1,8 @@
 function [ output_args ] = seek( vols, temps, ammoniaRatio )
-%SEEK Summary of this function goes here
-%   Detailed explanation goes here
+%SEEK This function finds the maximum conversion of ammonia achieved that
+%meets the legal specification of the NO concentration level. It does this
+%using a brute-force approach, and may take some time. The inner for-loop
+%is parallel-ised to speed up the process slightly.
 
 %% Load ToolBox & Data
 % Load the data from the function
@@ -19,6 +21,7 @@ for k=1:length(ammoniaRatio)
     ammoniaRatioForThisRun = ammoniaRatio(k);
     for j=1:length(temps)
         tempForThisRun = temps(j);
+        %parfor loop to run in parallel accross a parallel pool.
         parfor i=1:length(vols)
             [corrConcNO, ~, conversionNH3, ~, ~] = reactorAsPFR(flueGasData,shomateVars, Hf298, vols(i), tempForThisRun, ammoniaRatioForThisRun,1);
             if corrConcNO < 200 && corrConcNO > 160
@@ -35,8 +38,10 @@ for k=1:length(ammoniaRatio)
     res(:,:,k) = tempTempRet;
 end
 
-% Calc the optimised parameter
+% Calc the optimised parameter - i.e. the highest conversion of ammonia
+% that meets the specifications
 [M,indicie] = max(res(:));
+% Identify the co-ordinates of the maximised parameter
 [x,y,z] = ind2sub(size(res),indicie);
 fprintf('Optimised Reactor Parameters:\n');
 fprintf('Highest Ammonia Conversion: %.2f %% @\n', M);

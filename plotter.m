@@ -1,3 +1,7 @@
+function [] = plotter()
+% This function plots a variety of graphs that are used to analysise the
+% results of our reactor - the variables are modified directly in this
+% file, and not at run-time.
 %% Load ToolBox & Data
 addpath('jsonlab');
 % Load the data from the function
@@ -74,4 +78,4 @@ figure(4)
 surf(ammoniaRatio,temps,xnh3surf);
 figure(6)
 surf(ammoniaRatio,temps,xnosurf);
-
+end

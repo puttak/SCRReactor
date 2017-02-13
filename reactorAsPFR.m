@@ -63,8 +63,10 @@ Hf = @(x,T,H298) H298+x(1)*(T/1000)+x(2)*((T/1000)^2)/2+x(3)*((T/1000)^3)/3+x(4)
         r1Balance = [-4 4 -4 6 -1 0];
         r2Balance = [0 2 -4 6 -3 0];
         
+        % One for-loop per reaction that is considered
         for i=1:length(r1Balance)
             if r1Balance(i)>=0
+                % Only need data for reactants
                 r1HRxn(i) = 0;
             else
                 tBalance = r1Balance./abs(r1Balance(i));
@@ -75,6 +77,7 @@ Hf = @(x,T,H298) H298+x(1)*(T/1000)+x(2)*((T/1000)^2)/2+x(3)*((T/1000)^3)/3+x(4)
                     
                 end
                 sumForRxn = sumForRxn.*tBalance;
+                % Heat of reaction is calculated
                 r1HRxn(i) = sum(sumForRxn);
             end
         end

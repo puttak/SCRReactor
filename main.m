@@ -11,10 +11,6 @@ addpath('jsonlab');
 flueGasData = initialFlueGasFlow();
 [shomateVars, Hf298] = shomateLoader([{'NO'},{'N2'},{'NH3'},{'H2O'},{'O2'},{'CO2'}]);
 
-
-%% Size the Reactor
-[corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, 16, 620, 0.85,1);
-
 %% Run Menu to Select Option
 fprintf('SCR Reactor Modeller\n');
 fprintf('Select option:\n');
@@ -28,6 +24,8 @@ if answer == 1
     plotter();
 elseif answer == 2
     % Optimise Conditions
+    % Ranges must be entered in the format of i:j:k - or directly supplied
+    % as vectors - no checking is performed that they are ranges however.
     fprintf('Enter the following as ranges: \n');
     vols = input('Volume of Reactor (m^3): ');
     temps = input('Inlet Temperature (K): ');
@@ -39,7 +37,13 @@ else
     T = input('Inlet Temperature (K): ');
     NOxToAmmoniaRatio = input('Ammonia:NOx Ratio: ');
     NOXpercent = input('NOx Ratio: ');
-    [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, vol, T, NOxToAmmoniaRatio, NOXpercent)
+    [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, vol, T, NOxToAmmoniaRatio, NOXpercent);
+    % Print the output
+    fprintf('Concentration of NO at stack: %d mg/Nm^3 \n', round(corrConcNO));
+    fprintf('Conversion of NO acheived: %d %% \n', round(conversionNO));
+    fprintf('Conversion of NH3 acheived: %d %% \n', round(conversionNH3));
+    fprintf('Rate constant Eq 1: %.2f s^-1 \n', kNO);
+    fprintf('Rate constant Eq 2: %.2f s^-1 \n', kNH3);
 end
 
 

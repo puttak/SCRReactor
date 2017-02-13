@@ -1,4 +1,4 @@
-% This function loads the data nessisary to use the shomate equation. The
+% This function loads the data necessary to use the shomate equation. The
 % data is loaded from a JSON file, using the JSONLAB toolbox; and then
 % manipulated into the format needed.
 
