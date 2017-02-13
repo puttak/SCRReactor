@@ -15,45 +15,32 @@ flueGasData = initialFlueGasFlow();
 %% Size the Reactor
 [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, 16, 620, 0.85,1);
 
-%% Optimisation routine - this will take a while
+%% Run Menu to Select Option
+fprintf('SCR Reactor Modeller\n');
+fprintf('Select option:\n');
+fprintf('(1) Plot Graphs\n');
+fprintf('(2) Optimise Conditions\n');
+fprintf('(3) Model Single Reactor Configuration\n');
+answer = input('1/2/3: ');
 
-vols = 1:1:16;
-temps = 580:5:650;
-ammoniaRatio = 0.5:0.1:1.5;
-
-count = 0;
-countPerRun = length(vols);
-totalCount = length(vols)*length(temps)*length(ammoniaRatio);
-
-% Preallocate the matrix for speed
-res = zeros(length(vols),length(temps),length(ammoniaRatio));
-
-for k=1:length(ammoniaRatio)
-    ammoniaRatioForThisRun = ammoniaRatio(k);
-    for j=1:length(temps)
-        tempForThisRun = temps(j);
-        parfor i=1:length(vols)
-            [corrConcNO, ~, conversionNH3, ~, ~] = reactorAsPFR(flueGasData,shomateVars, Hf298, vols(i), tempForThisRun, ammoniaRatioForThisRun,1);
-            if corrConcNO < 200 && corrConcNO > 160
-                tempVolRet(i) = conversionNH3;
-            else
-                tempVolRet(i) = 0;
-            end
-        end
-        tempTempRet(:,j) = tempVolRet;
-        clc;
-        count = count+countPerRun;
-        fprintf('%d/%d\n', count, totalCount);
-    end
-    res(:,:,k) = tempTempRet;
+if answer == 1
+    % Plot Graphs
+    plotter();
+elseif answer == 2
+    % Optimise Conditions
+    fprintf('Enter the following as ranges: \n');
+    vols = input('Volume of Reactor (m^3): ');
+    temps = input('Inlet Temperature (K): ');
+    ammoniaRatio = input('Ammonia:NOx Ratio: ');
+    seek(vols, temps, ammoniaRatio);
+else
+    % Model a single reactor
+    vol = input('Volume of Reactor (m^3): ');
+    T = input('Inlet Temperature (K): ');
+    NOxToAmmoniaRatio = input('Ammonia:NOx Ratio: ');
+    NOXpercent = input('NOx Ratio: ');
+    [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, vol, T, NOxToAmmoniaRatio, NOXpercent)
 end
 
-% Calc the optimised parameter
-[M,indicie] = max(res(:));
-[x,y,z] = ind2sub(size(res),indicie);
-fprintf('Optimised Reactor Parameters:\n');
-fprintf('Highest Ammonia Conversion: %.2f %% @\n', M);
-fprintf('Volume (m^3): %d\n', vols(x));
-fprintf('Temperature (K): %d\n', temps(y));
-fprintf('Ammonia Ratio: %.2f\n', ammoniaRatio(z));
+
 
