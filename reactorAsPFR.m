@@ -1,4 +1,4 @@
-function [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, vol, T, NOxToAmmoniaRatio)
+function [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flueGasData,shomateVars, Hf298, vol, T, NOxToAmmoniaRatio, NOXpercent)
 % This Script models a NOx removal by SCR unit. The reactor is modelled as
 % a plug flow reactor, where the volume corresponds to the volume of the
 % wall of the monolith honeycomb
@@ -10,34 +10,23 @@ function [corrConcNO, conversionNO, conversionNH3, kNO, kNH3] = reactorAsPFR(flu
 
 %% Reactant Inital data:
 
-NOXpercent = 1.15;
-% NOxToAmmoniaRatio = 1.15;
-NOxToOxygenRatio = NOxToAmmoniaRatio*20*0.21;
-NOxToNitrogenRation = NOxToAmmoniaRatio*20*0.79;
+NOxToOxygenRatio = NOxToAmmoniaRatio*20*0.21*NOXpercent;
+NOxToNitrogenRation = NOxToAmmoniaRatio*20*0.79*NOXpercent;
 
 initMolarFlows = [NOXpercent*(flueGasData.molarFlows.nitrogenOxide+flueGasData.molarFlows.nitrogenDioxide),...
-    flueGasData.molarFlows.nitrogen+NOxToNitrogenRation*flueGasData.molarFlows.nitrogenOxide, flueGasData.molarFlows.ammonia+NOxToAmmoniaRatio*flueGasData.molarFlows.nitrogenOxide,...
+    flueGasData.molarFlows.nitrogen+NOxToNitrogenRation*flueGasData.molarFlows.nitrogenOxide, flueGasData.molarFlows.ammonia+NOxToAmmoniaRatio*NOXpercent*flueGasData.molarFlows.nitrogenOxide,...
     flueGasData.molarFlows.water, flueGasData.molarFlows.oxygen+NOxToOxygenRatio*flueGasData.molarFlows.nitrogenOxide,...
     flueGasData.molarFlows.carbonDioxide+flueGasData.molarFlows.hydrogenChloride+...
     flueGasData.molarFlows.sulphurDioxide+flueGasData.molarFlows.sulphurTrioxide]';
 initMolarFlows = initMolarFlows*1000; 
-initMoleFraction = initMolarFlows./sum(initMolarFlows);
 P = 200000;
 R = 8.314;
-%T = 600;
-%volume = sum(initMolarFlows)*R*T/P;
-bulkConcentration = initMoleFraction.*((P/(R*T)));
+
 
 %% Reaction Rate Laws & Constants
 kNO = (1e6)*exp(-60e3/(R*T));
 kNH3 = (6.8e7)*exp(-85e3/(R*T));
 KNH3 = (2.57e-17)*exp(2.37e5/(R*T));
-
-cat_SpecSurAre =  146; %m
-
-
-%r1 = @(c_NO,c_NH3) (kNO*KNH3*c_NO*c_NH3)/(1+KNH3*c_NH3);
-% [shomateVars, Hf298] = shomateLoader([{'NO'},{'N2'},{'NH3'},{'H2O'},{'O2'},{'CO2'}]);
 
 cp = @(x,T) x(1)+x(2)*(T/1000)+x(3)*(T/1000)^2+x(4)*(T/1000)^3+x(5)/((T/1000)^2);
 Hf = @(x,T,H298) H298+x(1)*(T/1000)+x(2)*((T/1000)^2)/2+x(3)*((T/1000)^3)/3+x(4)*((T/1000)^4)/4-x(5)/(T/1000)+x(6)-x(8);
@@ -107,19 +96,12 @@ Hf = @(x,T,H298) H298+x(1)*(T/1000)+x(2)*((T/1000)^2)/2+x(3)*((T/1000)^3)/3+x(4)
 options = odeset('Refine',1,'NonNegative',1);
 [w, fa] = ode23(@odewfa,0:0.01:vol,[initMolarFlows; T],options);
  
-%% Plot Graph
-% plot(w,fa(:,1),w,fa(:,3));
-% legend('NO','NH3');
-% grid on;
-
 %% Output Conversions and Normallised Stack Concentration
 % Stack concentration assumes 99% of the CO2 will be removed in the
 % following process and also discounts any additional water added.
 
 conversionNO = ((initMolarFlows(1)-fa(end,1))/initMolarFlows(1))*100;
-% fprintf('Conversion NO Acheived: %d %%\n', round(conversionNO));
 conversionNH3 = ((initMolarFlows(3)-fa(end,3))/initMolarFlows(3))*100;
-% fprintf('Conversion NH3 Acheived: %d %%\n', round(conversionNH3));
 
 % Calculate the approximate mg/Nm3 
 
@@ -141,7 +123,6 @@ concNO = (GNO/volSC)*1000; %mg/Nm3
 
 corrConcNO = concNO * o2CorrectionFactor;
 
-% fprintf('Approximate Normallised Stack Concentration of NOx is: %d mg/Nm^3 \n', round(corrConcNO));
 
 
 

@@ -36,9 +36,11 @@ layerDes = 3;
 blockReqPerLayer = acBlockReq/layerDes;
 % Assume layer is a square
 elementsPerSideOfLayer = sqrt(blockReqPerLayer);
-acElementsPerSideOfLayer = ceil(elementsPerSideOfLayer);
+acElementsPerSideOfLayer = ceil(elementsPerSideOfLayer)
 
 layerDimention = acElementsPerSideOfLayer*lengthPerSide
+
+actualVol = (acElementsPerSideOfLayer^2)*3*catalystVolumePerBlock
 
 
 
